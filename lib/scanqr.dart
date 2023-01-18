@@ -111,7 +111,8 @@ class _ScanState extends State<Scan> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("SCAN QR CODE"),
+        backgroundColor: Colors.orange,
+        title: Text("SCAN QR CODE",style: TextStyle(color: Colors.black),),
       ),
       body: Column(
         children: [
@@ -147,6 +148,7 @@ class _ScanState extends State<Scan> {
                     child: ElevatedButton(
                       onPressed: () => barcodeScan(),
                       style: ButtonStyle(
+                        backgroundColor: MaterialStateProperty.all<Color>(Colors.orange),
                           shape:
                               MaterialStateProperty.all<RoundedRectangleBorder>(
                                   RoundedRectangleBorder(
@@ -154,7 +156,7 @@ class _ScanState extends State<Scan> {
                                       side: BorderSide(color: Colors.black)))),
                       child: Text(
                         "Open Scanner",
-                        style: TextStyle(fontSize: 30),
+                        style: TextStyle(fontSize: 30,color: Colors.black),
                       ),
                     ),
                   )
