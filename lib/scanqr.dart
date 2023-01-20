@@ -27,7 +27,7 @@ class _ScanState extends State<Scan> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text("FOUND",
+          Text("Valid User and Not Entered",
               style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -56,7 +56,7 @@ class _ScanState extends State<Scan> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text("NOT FOUND",
+          Text("No Entry",
               style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
@@ -85,7 +85,7 @@ class _ScanState extends State<Scan> {
           Text("Connection Error.",
               style: TextStyle(
                   fontWeight: FontWeight.bold,
-                  color: Colors.white,
+                  color: Colors.black,
                   fontSize: 25)),
         ],
       ),
@@ -131,8 +131,7 @@ class _ScanState extends State<Scan> {
         showDialog(
             context: context,
             builder: (BuildContext context) => _buildPopupDialog2(context));
-      }
-      else if (valid == "true" && entry=="false" ) {
+      } else if (valid == "true" && entry == "true") {
         showDialog(
             context: context,
             builder: (BuildContext context) => _buildPopupDialog2(context));
