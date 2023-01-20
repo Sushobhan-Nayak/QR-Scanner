@@ -8,7 +8,8 @@ import 'dart:convert';
 
 String? apires;
 Map? mapres;
-Map? datares;
+String? valid;
+String? entry;
 
 class Scan extends StatefulWidget {
   const Scan({super.key});
@@ -26,7 +27,11 @@ class _ScanState extends State<Scan> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text("FOUND",style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white,fontSize: 25)),
+          Text("FOUND",
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  fontSize: 25)),
         ],
       ),
       actions: <Widget>[
@@ -34,11 +39,15 @@ class _ScanState extends State<Scan> {
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: const Text('Close',style: TextStyle(color: Colors.black),),
+          child: const Text(
+            'Close',
+            style: TextStyle(color: Colors.black),
+          ),
         ),
       ],
     );
   }
+
   Widget _buildPopupDialog2(BuildContext context) {
     return AlertDialog(
       backgroundColor: Colors.red,
@@ -47,7 +56,11 @@ class _ScanState extends State<Scan> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text("NOT FOUND",style: TextStyle(fontWeight: FontWeight.bold,color: Colors.white,fontSize: 25)),
+          Text("NOT FOUND",
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  fontSize: 25)),
         ],
       ),
       actions: <Widget>[
@@ -55,7 +68,36 @@ class _ScanState extends State<Scan> {
           onPressed: () {
             Navigator.of(context).pop();
           },
-          child: const Text('Close',style: TextStyle(color: Colors.black)),
+          child: const Text('Close', style: TextStyle(color: Colors.black)),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPopupDialog3(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: Colors.grey,
+      title: const Text('ERROR'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text("Connection Error.",
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                  fontSize: 25)),
+        ],
+      ),
+      actions: <Widget>[
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+          child: const Text(
+            'Close',
+            style: TextStyle(color: Colors.black),
+          ),
         ),
       ],
     );
@@ -80,31 +122,44 @@ class _ScanState extends State<Scan> {
     if (!mounted) return;
     setState(() {
       qrcodeRES = barcodeScanRes;
-      datares!["id"].toString() == qrcodeRES.toString()
-          ? showDialog(
-              context: context,
-              builder: (BuildContext context) => _buildPopupDialog1(context))
-          : showDialog(
-              context: context,
-              builder: (BuildContext context) => _buildPopupDialog2(context));
+      apic();
+      if (valid == "true" && entry == "false") {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) => _buildPopupDialog1(context));
+      } else if (valid == "false") {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) => _buildPopupDialog2(context));
+      }
+      else if (valid == "true" && entry=="false" ) {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) => _buildPopupDialog2(context));
+      } else {
+        showDialog(
+            context: context,
+            builder: (BuildContext context) => _buildPopupDialog3(context));
+      }
     });
   }
 
   Future apic() async {
     http.Response response;
-    response = await http.get(Uri.parse("https://reqres.in/api/users/2"));
+    response = await http.get(Uri.parse("localhost:3000/validate/$qrcodeRES"));
     if (response.statusCode == 200) {
       setState(() {
-        mapres = json.decode(response.body);
-        datares = mapres!["data"];
+        try {
+          mapres = json.decode(response.body);
+          valid = mapres!["valid"].toString();
+          entry = mapres!["entry"].toString();
+        } catch (e) {
+          showDialog(
+              context: context,
+              builder: (BuildContext context) => _buildPopupDialog3(context));
+        }
       });
     }
-  }
-
-  @override
-  void initState() {
-    apic();
-    super.initState();
   }
 
   @override
@@ -112,15 +167,22 @@ class _ScanState extends State<Scan> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.orange,
-        title: Text("SCAN QR CODE",style: TextStyle(color: Colors.black),),
+        title: Text(
+          "SCAN QR CODE",
+          style: TextStyle(color: Colors.black),
+        ),
       ),
       body: Column(
         children: [
-          SizedBox(
-              height: 400,
-              width: 400,
-              child: Image.network(
-                  'https://media.istockphoto.com/id/1324706577/vector/qr-code-scan-label-scan-qr-code-icon-scan-me-text-vector-illustration.jpg?s=612x612&w=0&k=20&c=-JymAivr1WagKlQ2IrzQe-KYxv3W8efFae-MvjEUaZ4=')),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
+            child: SizedBox(
+                height: 400,
+                width: 400,
+                child: Image.asset(
+                  'images/new.png',
+                )),
+          ),
           Container(
             padding: EdgeInsets.all(15),
             child: Center(
@@ -148,7 +210,8 @@ class _ScanState extends State<Scan> {
                     child: ElevatedButton(
                       onPressed: () => barcodeScan(),
                       style: ButtonStyle(
-                        backgroundColor: MaterialStateProperty.all<Color>(Colors.orange),
+                          backgroundColor:
+                              MaterialStateProperty.all<Color>(Colors.orange),
                           shape:
                               MaterialStateProperty.all<RoundedRectangleBorder>(
                                   RoundedRectangleBorder(
@@ -156,7 +219,7 @@ class _ScanState extends State<Scan> {
                                       side: BorderSide(color: Colors.black)))),
                       child: Text(
                         "Open Scanner",
-                        style: TextStyle(fontSize: 30,color: Colors.black),
+                        style: TextStyle(fontSize: 30, color: Colors.black),
                       ),
                     ),
                   )
